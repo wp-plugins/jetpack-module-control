@@ -6,7 +6,7 @@ Description: Control Jetpack module activation and availability across your Word
 Text Domain: jetpack-mc
 Domain Path: languages
 Network: true
-Version: 0.3
+Version: 0.4
 Author: RavanH
 Author URI: http://status301.net/
 */
@@ -17,10 +17,16 @@ Author URI: http://status301.net/
  * version 1.0
  * Add "Use Jetpack without connecting to WordPress.com" option.
  * see http://jeremy.hu/customize-the-list-of-modules-available-in-jetpack/
+ * >> add_filter( 'jetpack_development_mode', '__return_true' );
  * 
  * version 2.0
  * Replace "Prevent the Jetpack plugin from auto-activating (new) modules" with 
  * finer grained "Select which modules to auto-activate"
+ * see http://jeremy.hu/customize-the-list-of-modules-available-in-jetpack/
+ * 	function jeherve_auto_activate_stats() {
+		return array( 'stats' );
+	}
+	add_filter( 'jetpack_get_default_modules', 'jeherve_auto_activate_stats' );
  * 
  * TO CONSIDER
  * Make blacklist or whitelist optional
@@ -335,11 +341,12 @@ class Jetpack_Module_Control {
 	 */
 
 	public function admin_init(){
-		add_filter('plugin_action_links_' . $this->plugin_basename(), array($this, 'add_action_link') );
-		
+	
 		$this->no_manage_notice();
 
 		if ( is_plugin_active_for_network( $this->plugin_basename() ) ) {
+
+			add_filter( 'network_admin_plugin_action_links_' . $this->plugin_basename(), array($this, 'add_action_link') );
 
 			// Add settings to Network Settings
 			// thanks to http://zao.is/2013/07/adding-settings-to-network-settings-for-wordpress-multisite/
@@ -350,6 +357,8 @@ class Jetpack_Module_Control {
 
 		} else {
 			
+			add_filter( 'plugin_action_links_' . $this->plugin_basename(), array($this, 'add_action_link') );
+
 			// Do regular register/add_settings stuff in 'general' settings on options-general.php 
 			$settings = 'general';
 

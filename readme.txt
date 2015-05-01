@@ -1,6 +1,6 @@
 === Jetpack Module Control ===
 Contributors: RavanH
-Tags: Jetpack, jet pack, module, modules, manual control, blacklist, blacklist modules
+Tags: Jetpack, jet pack, module, modules, manual control, blacklist, blacklist modules, slim jetpack, jetpack light
 Stable tag: 0.3
 Requires at least: 4.1
 Tested up to: 4.2
@@ -11,9 +11,16 @@ Your Jetpack, Restricted.
 
 == Description ==
 
-[Jetpack](http://jetpack.me/) adds powerful features but sometimes we don't want them all. This plugin will allow you to blacklist / remove individual Jetpack modules. It can also prevent the auto-activation of Jetpack modules.
+[Jetpack](https://wordpress.org/plugins/jetpack/) adds powerful features... but sometimes we don't want them all. This plugin will allow you to blacklist / remove individual Jetpack modules. It can also prevent the auto-activation of Jetpack modules.
 
-This plugin was created to run both on single site and multisite installations. On multisite, it can only be network activated.
+This plugin can run on single and multisite installations. 
+
+In most use cases, a carefully considered combination of Jetpack modules can be a really good thing. But not always is much consideration being done beforehand. Or site admins just don't know all the implications... Some examples: Does your web server use a server side caching making it incompatible with the Mobile Theme module? Do you already have a lightbox plugin running, making the Carousel module is redundant? Do you not want anyone monitoring uptime with the Monitor module just to call you every time the site was not accessible for a second? Do you offer your own backup formula and do not care much for VaultPress's competition? Any one of Jetpack's modules can bring overlapping or even conflicting functionality. In such cases, being able to remove them is a good thing.
+ 
+On multisite, it can only be network activated and controls Jetpack on all sites. Jetpack itself can, but does not need to be, network activated.
+
+For single site installations, this plugin would only serve purpose if the site has multiple administrators and the primary admin wants to prevent other admins from switching on certain modules. The primary admin needs access to the wp-config.php to be able to lock down the plugins settings for complete security.
+
 
 == Installation ==
 
@@ -25,9 +32,14 @@ This plugin was created to run both on single site and multisite installations. 
 
 == Screenshots ==
 
-1. Blacklist selection.
+1. Options section with Blacklist.
 
 == Changelog ==
+
+= 0.4 =
+Date: 
+
+* Settings action link on Network plugins page
 
 = 0.3 =
 Date: April 27rd, 2015
