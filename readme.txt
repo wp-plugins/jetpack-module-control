@@ -1,7 +1,7 @@
 === Jetpack Module Control ===
 Contributors: RavanH
 Tags: Jetpack, jet pack, module, modules, manual control, blacklist, blacklist modules, slim jetpack, jetpack light
-Stable tag: 0.3
+Stable tag: 0.4
 Requires at least: 4.1
 Tested up to: 4.2
 License: GPLv2 or later
@@ -34,10 +34,15 @@ For single site installations, this plugin would only serve purpose if the site 
 
 1. Options section with Blacklist.
 
+== Upgrade Notice ==
+
+= 0.4 =
+Fix: action link on Network plugins page.
+
 == Changelog ==
 
 = 0.4 =
-Date: 
+Date: Mai 1st, 2015 
 
 * Settings action link on Network plugins page
 
