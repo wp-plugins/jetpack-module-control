@@ -65,7 +65,7 @@ class Jetpack_Module_Control {
 	 * @since 0.1
 	 * @var string 
 	 */
-	public $version = '0.3';
+	public $version = '0.4';
 	
 	/**
 	 * Available modules array
