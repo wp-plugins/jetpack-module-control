@@ -36,10 +36,15 @@ For single site installations, this plugin would only serve purpose if the site 
 
 == Upgrade Notice ==
 
-= 0.4 =
-Fix: action link on Network plugins page.
+= 1.0 =
+New: Jetpack Debug Mode to allow modules without connection.
 
 == Changelog ==
+
+= 1.0 =
+Date: Mai 2nd, 2015
+
+* Jetpack Debug Mode to allow modules without connection
 
 = 0.4 =
 Date: Mai 1st, 2015 

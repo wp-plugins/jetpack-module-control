@@ -6,18 +6,13 @@ Description: Control Jetpack module activation and availability across your Word
 Text Domain: jetpack-mc
 Domain Path: languages
 Network: true
-Version: 0.4
+Version: 1.0-beta1
 Author: RavanH
 Author URI: http://status301.net/
 */
 
 /*
  * ROADMAP
- * 
- * version 1.0
- * Add "Use Jetpack without connecting to WordPress.com" option.
- * see http://jeremy.hu/customize-the-list-of-modules-available-in-jetpack/
- * >> add_filter( 'jetpack_development_mode', '__return_true' );
  * 
  * version 2.0
  * Replace "Prevent the Jetpack plugin from auto-activating (new) modules" with 
@@ -29,9 +24,15 @@ Author URI: http://status301.net/
 	add_filter( 'jetpack_get_default_modules', 'jeherve_auto_activate_stats' );
  * 
  * TO CONSIDER
+ * 
  * Make blacklist or whitelist optional
- * Option to disable JUMPSTART
- * Can we disable Debug link in the footer menu?
+ * 
+ * Option to disable JUMPSTART with "Jetpack_Options::update_option( 'jumpstart', 'jumpstart_dismissed' );" ??
+ * or do we need to go through apply_filters( 'jetpack_module_feature' ... 
+ * If we want to be able to select which modules should appear in Jumpstart later!
+ * 
+ * Can we disable Debug link in the footer menu? No...
+ * 
  * Option to "force_deactivate" (same as blacklist?) as described on https://github.com/Automattic/jetpack/issues/1452
  * 
  */
@@ -65,7 +66,7 @@ class Jetpack_Module_Control {
 	 * @since 0.1
 	 * @var string 
 	 */
-	public $version = '0.3';
+	public $version = '1.0';
 	
 	/**
 	 * Available modules array
@@ -215,12 +216,13 @@ class Jetpack_Module_Control {
 	 * 
 	 * @uses jetpack_mc_manual_control network option
 	 * @echo Html Checkbox input field for jetpack_mc_manual_control option
+	 * @return void
 	 */	
 	public function manual_control_settings() {		
 
 		$cws_manual_control = class_exists('CWS_Manual_Control_for_Jetpack_Plugin') ? true : false;
 		$option = $cws_manual_control ? '1' : get_site_option('jetpack_mc_manual_control');	
-		$disabled = $cws_manual_control || ( defined('JETPACK_MC_LOCKDOWN') && JETPACK_MC_LOCKDOWN == true ) ? true : false;
+		$disabled = $cws_manual_control || ( defined('JETPACK_MC_LOCKDOWN') && JETPACK_MC_LOCKDOWN ) ? true : false;
 
 		?>
 		<label>
@@ -235,17 +237,65 @@ class Jetpack_Module_Control {
 
 	/**
 	 * Activates Manual Control by returning an empty array on module auto-activation. 
-	 * Modelled after Manual Control for Jetpack by Mark Jaquith http://coveredwebservices.com/
+	 * First modelled after Manual Control for Jetpack by Mark Jaquith http://coveredwebservices.com/
+	 * To be converted to allow selected modules instead of all or none.
 	 * 
 	 * @since 0.1
 	 * @see add_filter()
 	 */
-	public function manual_control() {
+	public function manual_control( $modules ) {
 		
-		if ( get_site_option('jetpack_mc_manual_control', false) )
-			add_filter( 'jetpack_get_default_modules', '__return_empty_array', 99 );
+		return get_site_option('jetpack_mc_manual_control', false) ? array() : $modules;
 
 	} // END manual_control()
+
+	/**
+	 * DEVELOPMENT MODE
+	 */
+	    	
+	/**
+	 * Adds the Jetpack Without WordPress.com option
+	 * 
+	 * @since 1.0
+	 * @see get_site_option(), checked(), disabled()
+	 * 
+	 * @echo Html Checkbox input field for jetpack_mc_development_mode option
+	 * @return void
+	 */	
+	public function development_mode_settings() {		
+		
+		$slimjetpack = is_plugin_active('slimjetpack/slimjetpack.php') ? true : false;
+		$option = $slimjetpack ? '1' : get_site_option('jetpack_mc_development_mode');	
+		$disabled = $slimjetpack || ( defined('JETPACK_DEV_DEBUG') && JETPACK_DEV_DEBUG ) ? true : false;
+
+		?>
+		<label>
+			<input type='checkbox' name='jetpack_mc_development_mode' value='1' 
+			<?php checked( $option, '1' ); ?> 
+			<?php disabled( $disabled ); ?>> 
+			<?php _e('Allow activating Jetpack modules without a WordPress.com connection.','jetpack-mc'); ?>
+		</label>
+		<p class="description"><?php _e('By forcing Jetpack into development mode, modules can be used without a WordPress.com account. All modules that cannot run without a WordPress.com connection are disabled.','jetpack-mc'); ?></p>
+		<?php
+
+	} // END development_mode_settings()
+
+	/**
+	 * Activates Development Mode by returning true on jetpack_development_mode filter. 
+	 * Based on http://jeremy.hu/customize-the-list-of-modules-available-in-jetpack/
+	 * 
+	 * @since 1.0
+	 * @see add_filter()
+	 */
+	public function development_mode() {
+		
+		return get_site_option('jetpack_mc_development_mode', false) ? true : false;
+
+	} // END development_mode()
+
+	/**
+	 * ADMIN NOTICES
+	 */
 
 	/**
 	 * Disables Centralized Site Management banner by returning false on can_display_jetpack_manage_notice filter. 
@@ -262,6 +312,18 @@ class Jetpack_Module_Control {
 
 	} // END no_manage_notice()
 
+	/**
+	 * Disables Centralized Site Management banner by returning false on can_display_jetpack_manage_notice filter. 
+	 * 
+	 * @since 0.1
+	 * @see add_filter()
+	 */
+	private function no_dev_notice() {
+
+		if ( get_site_option('jetpack_mc_development_mode', false) && class_exists('Jetpack') )
+			remove_action( 'jetpack_notices', array( Jetpack::init(), 'show_development_mode_notice' ) );
+
+	} // END no_dev_notice()
 
 	/**
 	 * BLACKLIST
@@ -344,6 +406,8 @@ class Jetpack_Module_Control {
 	
 		$this->no_manage_notice();
 
+		$this->no_dev_notice();
+
 		if ( is_plugin_active_for_network( $this->plugin_basename() ) ) {
 
 			add_filter( 'network_admin_plugin_action_links_' . $this->plugin_basename(), array($this, 'add_action_link') );
@@ -367,11 +431,13 @@ class Jetpack_Module_Control {
 			// register settings
 			if ( !defined('JETPACK_MC_LOCKDOWN') || JETPACK_MC_LOCKDOWN == false ) {
 				register_setting( $settings, 'jetpack_mc_manual_control' ); // sanitize_callback 'boolval' ?
+				register_setting( $settings, 'jetpack_mc_development_mode' ); // sanitize_callback 'boolval' ?
 				register_setting( $settings, 'jetpack_mc_blacklist', 'array_values' );
 			}
 			
 			// add settings fields
 			add_settings_field( 'jetpack_mc_manual_control', __('Manual Control','jetpack-mc'), array($this, 'manual_control_settings'), $settings, 'jetpack-mc' ); // array('label_for' => 'elementid')
+			add_settings_field( 'jetpack_mc_development_mode', __('Development Mode','jetpack-mc'), array($this, 'development_mode_settings'), $settings, 'jetpack-mc' ); // array('label_for' => 'elementid')
 			add_settings_field( 'jetpack_mc_blacklist', __('Blacklist Modules','jetpack-mc'), array($this, 'blacklist_settings'), $settings, 'jetpack-mc' );
 
 		}
@@ -392,6 +458,9 @@ class Jetpack_Module_Control {
 
 		if( isset( $_POST['jetpack_mc_manual_control'] ) )
 			$posted_settings['jetpack_mc_manual_control'] = '1';
+
+		if( isset( $_POST['jetpack_mc_development_mode'] ) )
+			$posted_settings['jetpack_mc_development_mode'] = '1';
 
 		if( isset( $_POST['jetpack_mc_blacklist'] ) )
 			$posted_settings['jetpack_mc_blacklist'] = array_values($_POST['jetpack_mc_blacklist']);
@@ -420,6 +489,14 @@ class Jetpack_Module_Control {
 					<td>
 						<?php
 						$this->manual_control_settings();
+						?>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php _e('Development Mode','jetpack-mc'); ?></th>
+					<td>
+						<?php
+						$this->development_mode_settings();
 						?>
 					</td>
 				</tr>
@@ -501,6 +578,8 @@ class Jetpack_Module_Control {
 				$this->get_available_modules();
 		}
 
+		add_filter( 'jetpack_get_default_modules', array( $this, 'manual_control' ), 99 );
+		add_filter( 'jetpack_development_mode', array( $this, 'development_mode' ) );
 		add_filter( 'jetpack_get_available_modules', array( $this, 'blacklist' ) );
 	}
 
@@ -525,8 +604,7 @@ class Jetpack_Module_Control {
 	 */
 	private function __construct() { 
 		add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 0 );
-		add_action( 'init', array( $this, 'manual_control' ), 11 );
-		add_action( 'admin_init', array($this,'admin_init') );
+		add_action( 'admin_init', array($this,'admin_init'), 11 );
 	}
 
 	/**
