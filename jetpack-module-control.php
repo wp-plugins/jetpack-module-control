@@ -264,9 +264,9 @@ class Jetpack_Module_Control {
 	 */	
 	public function development_mode_settings() {		
 		
-		$slimjetpack = is_plugin_active('slimjetpack/slimjetpack.php') ? true : false;
-		$option = $slimjetpack ? '1' : get_site_option('jetpack_mc_development_mode');	
-		$disabled = $slimjetpack || ( defined('JETPACK_DEV_DEBUG') && JETPACK_DEV_DEBUG ) ? true : false;
+		$forced = is_plugin_active('slimjetpack/slimjetpack.php') || ( defined('JETPACK_DEV_DEBUG') && JETPACK_DEV_DEBUG ) ? true : false;
+		$option = $forced ? '1' : get_site_option('jetpack_mc_development_mode');	
+		$disabled = $forced || ( defined('JETPACK_MC_LOCKDOWN') && JETPACK_MC_LOCKDOWN ) ? true : false;
 
 		?>
 		<label>
@@ -415,8 +415,12 @@ class Jetpack_Module_Control {
 			// Add settings to Network Settings
 			// thanks to http://zao.is/2013/07/adding-settings-to-network-settings-for-wordpress-multisite/
 			if ( is_network_admin() ) {
-				add_filter( 'wpmu_options'       , array( $this, 'show_network_settings' ) );
-				add_action( 'update_wpmu_options', array( $this, 'save_network_settings' ) );
+				add_filter( 'wpmu_options', array( $this, 'show_network_settings' ) );
+				if ( defined('JETPACK_MC_LOCKDOWN') && JETPACK_MC_LOCKDOWN ) {
+					// do not add action to save network settings
+				} else {
+					add_action( 'update_wpmu_options', array( $this, 'save_network_settings' ) );
+				}
 			}
 
 		} else {
@@ -429,7 +433,9 @@ class Jetpack_Module_Control {
 			add_settings_section('jetpack-mc', '<a name="jetpack-mc"></a>' . __('Jetpack Module Control','jetpack-mc'), array($this, 'add_settings_section'), $settings);
 
 			// register settings
-			if ( !defined('JETPACK_MC_LOCKDOWN') || JETPACK_MC_LOCKDOWN == false ) {
+			if ( defined('JETPACK_MC_LOCKDOWN') && JETPACK_MC_LOCKDOWN ) {
+				// do not register settings to prevent them being updated
+			} else {
 				register_setting( $settings, 'jetpack_mc_manual_control' ); // sanitize_callback 'boolval' ?
 				register_setting( $settings, 'jetpack_mc_development_mode' ); // sanitize_callback 'boolval' ?
 				register_setting( $settings, 'jetpack_mc_blacklist', 'array_values' );
@@ -451,9 +457,6 @@ class Jetpack_Module_Control {
 	 */
 	public function save_network_settings() {
 
-		if ( defined('JETPACK_MC_LOCKDOWN') && JETPACK_MC_LOCKDOWN == true )
-			return;
-		
 		$posted_settings = array();
 
 		if( isset( $_POST['jetpack_mc_manual_control'] ) )
