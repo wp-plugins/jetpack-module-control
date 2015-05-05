@@ -1,7 +1,7 @@
 === Jetpack Module Control ===
 Contributors: RavanH
 Tags: Jetpack, jet pack, module, modules, manual control, blacklist, blacklist modules, slim jetpack, jetpack light
-Stable tag: 0.4
+Stable tag: 1.0
 Requires at least: 4.1
 Tested up to: 4.2
 License: GPLv2 or later
@@ -11,7 +11,7 @@ Your Jetpack, Restricted.
 
 == Description ==
 
-[Jetpack](https://wordpress.org/plugins/jetpack/) adds powerful features... but sometimes we don't want them all. This plugin will allow you to blacklist / remove individual Jetpack modules. It can also prevent auto-activation of any Jetpack modules.
+[Jetpack](https://wordpress.org/plugins/jetpack/) adds powerful features... but sometimes we don't want them all. This plugin brings additional control over Jetpack modules. You can blacklist / remove individual modules, prevent auto-activation or allow activation without a WordPress.com account.
 
 This plugin can run on single and multisite installations. 
 
@@ -49,6 +49,7 @@ New: Jetpack Debug Mode to allow modules without connection.
 Date: Mai 2nd, 2015
 
 * Jetpack Debug Mode to allow modules without connection
+* Show which modules need connection
 
 = 0.4 =
 Date: Mai 1st, 2015 
