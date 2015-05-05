@@ -7,7 +7,7 @@ Tested up to: 4.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Your Jetpack, Restricted.
+Your Jetpack, Controlled.
 
 == Description ==
 
