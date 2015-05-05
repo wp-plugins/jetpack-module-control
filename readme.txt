@@ -46,7 +46,7 @@ New: Jetpack Debug Mode to allow modules without connection.
 == Changelog ==
 
 = 1.0 =
-Date: Mai 2nd, 2015
+Date: Mai 5nd, 2015
 
 * Jetpack Debug Mode to allow modules without connection
 * Show which modules need connection
