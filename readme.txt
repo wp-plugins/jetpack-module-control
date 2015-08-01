@@ -55,10 +55,15 @@ Please [contact me](http://status301.net/contact-en/) to submit your translation
 
 == Upgrade Notice ==
 
-= 1.1 =
-Detect Unplug Jetpack
+= 1.2 =
+Fix https://github.com/RavanH/jetpack-module-control/issues/2
 
 == Changelog ==
+
+= 1.2 =
+Date: 2015/08/01
+
+* Fix "Missing argument 1 for Jetpack_Module_Control::add_settings_section()" https://github.com/RavanH/jetpack-module-control/issues/2
 
 = 1.1 =
 Date: 2015/05/11
